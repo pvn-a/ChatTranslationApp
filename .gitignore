@@ -1,0 +1,85 @@
+# ---------------------
+# Python
+# ---------------------
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+develop-eggs/
+dist/
+eggs/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.cache/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+# Environments
+env/
+venv/
+.venv/
+
+# Editor stuff
+*.swp
+*.swo
+*.idea/
+*.vscode/
+*.DS_Store
+
+# Logs
+*.log
+
+# ---------------------
+# Node.js
+# ---------------------
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+pnpm-debug.log
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# Build output
+dist/
+build/
+.cache/
+
+# Next.js output
+.next/
+out/
+
+# Static files
+*.lock
+
+# Parcel-bundler cache (https://parceljs.org/)
+.parcel-cache/
+
+# SvelteKit build
+.vercel/
+.svelte-kit/
+
+# ---------------------
+# General
+# ---------------------
+# Mac system files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+*.log.*
