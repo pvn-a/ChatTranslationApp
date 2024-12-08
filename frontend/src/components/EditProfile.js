@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import config from "./config";
 
 const EditProfile = ({ user, setUser }) => {
   const [password, setPassword] = useState('');
@@ -9,7 +10,7 @@ const EditProfile = ({ user, setUser }) => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.post('http://localhost:6767/edit-profile', {
+      const response = await axios.post(`${config.apiUrl}/edit-profile`, {
         username: user.username,
         password,
         language,

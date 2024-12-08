@@ -1,5 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  TextField,
+  Button,
+  Typography,
+  Container,
+  Box,
+  Link,
+} from "@mui/material";
+import config from "./config";
 
 function Login({ setUser }) {
   const [username, setUsername] = useState("");
@@ -7,7 +16,7 @@ function Login({ setUser }) {
   const navigate = useNavigate();
 
   const handleLogin = async () => {
-    const response = await fetch("http://localhost:6767/login", {
+    const response = await fetch(`${config.apiUrl}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password }),
@@ -15,40 +24,51 @@ function Login({ setUser }) {
 
     if (response.ok) {
       const data = await response.json();
-      // Store the username in sessionStorage
       sessionStorage.setItem("username", data.username);
-
-      // Update your user state accordingly
       setUser({ username: data.username });
-
-      alert(`Welcome ${data.username}`);
-      navigate("/chatroom");
+      // alert(`Welcome ${data.username}`);
+      navigate("/chats");
     } else {
       alert("Login failed. Check your credentials.");
     }
   };
 
   return (
-    <div>
-      <h2>Login</h2>
-      <input
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleLogin}>Login</button>
-      <p>
-        Don't have an account?{" "}
-        <button onClick={() => navigate("/signup")}>Sign Up</button>
-      </p>
-    </div>
+    <Container maxWidth="xs" style={{ marginTop: "50px" }}>
+      <Typography variant="h4" gutterBottom>
+        Login
+      </Typography>
+      <Box display="flex" flexDirection="column" gap={2} mt={2}>
+        <TextField
+          label="Username"
+          variant="outlined"
+          fullWidth
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <TextField
+          label="Password"
+          type="password"
+          variant="outlined"
+          fullWidth
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <Button variant="contained" color="primary" onClick={handleLogin}>
+          Login
+        </Button>
+        <Typography variant="body2">
+          Don't have an account?{" "}
+          <Link
+            component="button"
+            variant="body2"
+            onClick={() => navigate("/signup")}
+          >
+            Sign Up
+          </Link>
+        </Typography>
+      </Box>
+    </Container>
   );
 }
 
