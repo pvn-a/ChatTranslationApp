@@ -1,0 +1,16 @@
+.header {
+    background-color: #f0f0f0;
+    padding: 10px;
+    text-align: right;
+  }
+  
+  .container {
+    text-align: center;
+    margin-top: 50px;
+  }
+  
+  button {
+    margin: 10px;
+    padding: 10px 20px;
+  }
+  
