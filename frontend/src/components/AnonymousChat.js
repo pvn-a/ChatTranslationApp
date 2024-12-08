@@ -8,7 +8,7 @@ const AnonymousChat = ({ setUser }) => {
   useEffect(() => {
     // First, check if a logged-in username exists
     let storedUsername = sessionStorage.getItem('username');
-    if (storedUsername) {
+    if (false) {
       // User is logged in
       setIdentifier(storedUsername);
       setUser({ username: storedUsername });
