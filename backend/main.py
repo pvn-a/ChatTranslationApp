@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+import logging
 
 from exceptions import MyHTTPException
 from services import (
@@ -15,6 +16,7 @@ from services import (
 from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest
 
 app = FastAPI()
+logger = logging.getLogger(__name__)
 
 app.add_middleware(
     CORSMiddleware,
@@ -57,6 +59,14 @@ async def login(request: LoginRequest):
 async def edit_profile(request: EditProfileRequest):
     return await edit_profile_service(request)
 
+    
 @app.post("/translate")
 async def translate(request: TranslationRequest):
-    return await translate_message_service(request)
+    try:
+        logger.info("Processing translate request for user '%s'", request.username)
+        response = await translate_message_service(request)
+        logger.info("Translation successful for user '%s'", request.username)
+        return response
+    except HTTPException as e:
+        logger.error("Error during translation for user '%s': %s", request.username, e.detail)
+        raise e

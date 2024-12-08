@@ -2,6 +2,7 @@ from sqlalchemy import select
 from passlib.hash import bcrypt
 from fastapi import Depends, HTTPException
 import traceback
+import logging
 
 from database import engine, Base, mongo_client, mongo_db, chat_collection, get_session_local
 from models import User
@@ -10,6 +11,7 @@ from schemas import SignUpRequest, LoginRequest, EditProfileRequest, Translation
 from googletrans import Translator
 
 translator = Translator()
+logger = logging.getLogger(__name__)
 
 # Health Check
 def health_check_service():
@@ -100,24 +102,39 @@ async def edit_profile_service(request: EditProfileRequest):
             user.language_preference = request.language_preference
     return {"status": "success", "message": "Profile updated"}
 
-
 async def translate_message_service(request: TranslationRequest):
-    """
-    Translates a message from the source language to the target language.
-    """
     try:
-        # If the target language is not provided, fetch the user's language preference
+        logger.info("Received translation request for user '%s'", request.username)
+        
+        # Log the input request details
+        logger.debug(
+            "Request Details: message='%s', source_language='%s', target_language='%s'",
+            request.message, request.source_language, request.target_language
+        )
+
+        # Fetch user preference for the target language if not provided
         if not request.target_language:
             async for session in get_session_local():
                 async with session.begin():
                     query = await session.execute(select(User).where(User.username == request.username))
                     user = query.scalar()
                     if not user:
+                        logger.warning("User '%s' not found", request.username)
                         raise MyHTTPException(status_code=404, error="User not found")
                     request.target_language = user.language_preference
+                    logger.info(
+                        "User '%s' target language preference set to '%s'",
+                        request.username,
+                        user.language_preference,
+                    )
 
         # Perform Translation
         translated = translator.translate(request.message, src=request.source_language, dest=request.target_language)
+        logger.info(
+            "Successfully translated message from '%s' to '%s' for user '%s'",
+            request.source_language, request.target_language, request.username
+        )
+
         return {
             "status": "success",
             "original_message": request.message,
@@ -126,4 +143,5 @@ async def translate_message_service(request: TranslationRequest):
             "target_language": translated.dest,
         }
     except Exception as e:
+        logger.error("Translation failed for user '%s': %s", request.username, str(e), exc_info=True)
         raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
