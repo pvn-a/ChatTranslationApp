@@ -12,13 +12,17 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
-  # mongo:
-  #   image: mongo:6
-  #   container_name: mongo_container
-  #   ports:
-  #     - "27017:27017"
-  #   volumes:
-  #     - mongo_data:/data/db
+  mongo:
+    image: mongo:6
+    container_name: mongo_container
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: abc
+      MONGO_INITDB_ROOT_PASSWORD: abc
+      MONGO_INITDB_DATABASE: chat_db  # Optional: Automatically create a default database
+    ports:
+      - "27017:27017"  # Expose MongoDB on the host machine's port 27017
+    volumes:
+      - mongo_data:/data/db  # Persistent storage for MongoDB data across restarts
 
   # fastapi:
   #   build:
