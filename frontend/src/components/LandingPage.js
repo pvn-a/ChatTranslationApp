@@ -21,9 +21,9 @@ const LandingPage = () => {
           onClick={() => navigate("/auth")}
           style={{ margin: "10px" }}
         >
-          Auth Chat
+          Start Chatting ..
         </Button>
-        <Button
+        {/* <Button
           variant="outlined"
           color="secondary"
           size="large"
@@ -31,7 +31,7 @@ const LandingPage = () => {
           style={{ margin: "10px" }}
         >
           Anonymous Chat
-        </Button>
+        </Button> */}
       </Box>
     </Container>
   );

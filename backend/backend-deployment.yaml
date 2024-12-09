@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: <your-backend-image>  # Replace with your backend Docker image
+          ports:
+            - containerPort: 6767
+          env:
+            - name: POSTGRES_URL
+              value: "postgresql://abc:abc@postgres:5432/proj"
+            - name: MONGO_URL
+              value: "mongodb://abc:abc@mongo:27017/chat_db"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 6767
+  type: ClusterIP

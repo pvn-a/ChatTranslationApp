@@ -25,7 +25,8 @@ function Login({ setUser }) {
     if (response.ok) {
       const data = await response.json();
       sessionStorage.setItem("username", data.username);
-      setUser({ username: data.username });
+      sessionStorage.setItem("language_preference", data.language_preference);
+      setUser({ username: data.username, language_preference: data.language_preference });
       // alert(`Welcome ${data.username}`);
       navigate("/chats");
     } else {
