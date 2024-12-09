@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException, Query
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
@@ -11,9 +11,11 @@ from services import (
     sign_up_service,
     login_service,
     edit_profile_service,
-    translate_message_service
+    translate_message_service,
+    send_message_service,
+    get_chat_history_service
 )
-from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest
+from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest, SendMessageRequest
 
 app = FastAPI()
 logger = logging.getLogger(__name__)
@@ -70,3 +72,22 @@ async def translate(request: TranslationRequest):
     except HTTPException as e:
         logger.error("Error during translation for user '%s': %s", request.username, e.detail)
         raise e
+
+@app.post("/send-message")
+async def send_message(request: SendMessageRequest):
+    try:
+        response = await send_message_service(request)
+        return response
+    except HTTPException as e:
+        logger.error("Error in send_message: %s", e.detail)
+        raise e
+
+@app.get("/chat-history")
+async def get_chat_history(
+    user1: str = Query(..., description="First user's username"),
+    user2: str = Query(..., description="Second user's username")
+):
+    """
+    API endpoint to fetch chat history between two users.
+    """
+    return await get_chat_history_service(user1, user2)

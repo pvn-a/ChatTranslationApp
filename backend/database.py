@@ -15,6 +15,7 @@ Base = declarative_base()
 mongo_client = AsyncIOMotorClient(MONGO_URL)
 mongo_db = mongo_client["chat_db"]
 chat_collection = mongo_db["chats"]
+user_chats_collection = mongo_db["user_chats"]  # To track who chats with whom
 
 async def get_session_local():
     async with async_session() as session:

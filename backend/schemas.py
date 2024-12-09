@@ -29,4 +29,8 @@ class TranslationRequest(BaseModel):
     source_language: Optional[str] = None
     target_language: Optional[str] = None
 
+class SendMessageRequest(BaseModel):
+    sender: str
+    recipient: str
+    message: str
 
