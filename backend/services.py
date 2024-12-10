@@ -179,7 +179,7 @@ async def send_message_service(request: SendMessageRequest):
             "receiver": request.receiver_username,
             "original_message": request.message,
             "translated_message": translated_message,
-            "timestamp": datetime.datetime.utcnow(),
+            "timestamp": datetime.utcnow(),
         }
         await chat_collection.insert_one(message_data)
 
@@ -190,13 +190,13 @@ async def send_message_service(request: SendMessageRequest):
         if not chat_relationship:
             await user_chats_collection.insert_one({
                 "users": [request.sender_username, request.receiver_username],
-                "last_interaction": datetime.datetime.utcnow(),
+                "last_interaction": datetime.utcnow(),
             })
         else:
             # Update last interaction timestamp
             await user_chats_collection.update_one(
                 {"_id": chat_relationship["_id"]},
-                {"$set": {"last_interaction": datetime.datetime.utcnow()}}
+                {"$set": {"last_interaction": datetime.utcnow()}}
             )
 
         return {

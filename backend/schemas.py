@@ -30,7 +30,7 @@ class TranslationRequest(BaseModel):
     target_language: Optional[str] = None
 
 class SendMessageRequest(BaseModel):
-    sender: str
-    recipient: str
+    sender_username: str
+    receiver_username: str
     message: str
 
