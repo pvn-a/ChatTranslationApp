@@ -24,19 +24,17 @@ services:
     volumes:
       - mongo_data:/data/db  # Persistent storage for MongoDB data across restarts
 
-  # fastapi:
-  #   build:
-  #     context: .
-  #   container_name: fastapi_container
-  #   depends_on:
-  #     - postgres
-  #     - mongo
-  #   ports:
-  #     - "8000:8000"
-  #   environment:
-  #     POSTGRES_URL: postgres://myuser:mypassword@postgres:5432/mydb
-  #     MONGO_URL: mongodb://mongo:27017
-
+  backend:
+    image: backend  # comment this entire thing incase of local development
+    container_name: backend
+    environment:
+      MONGO_URL: mongodb://abc:abc@mongo_container:27017/chat_db?authSource=admin
+      POSTGRES_URL: postgresql+asyncpg://abc:abc@postgres_container:5432/proj
+    ports:
+      - "6767:6767"
+    depends_on:
+      - mongo
+      - postgres
 volumes:
   postgres_data:
   mongo_data:
