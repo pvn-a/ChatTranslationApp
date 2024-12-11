@@ -12,6 +12,8 @@ from models import User
 from exceptions import MyHTTPException
 from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest, SendMessageRequest
 from googletrans import Translator
+from database import redis_client
+
 
 translator = Translator()
 logger = logging.getLogger(__name__)
@@ -106,37 +108,46 @@ async def edit_profile_service(request: EditProfileRequest):
             user.language_preference = request.language_preference
     return {"status": "success", "message": "Profile updated"}
 
+from database import redis_client
+
 async def translate_message_service(request: TranslationRequest):
     try:
         logger.info("Received translation request for user '%s'", request.username)
-        
+
         # Log the input request details
         logger.debug(
             "Request Details: message='%s', source_language='%s', target_language='%s'",
             request.message, request.source_language, request.target_language
         )
 
-        # Fetch user preference for the target language if not provided
-        if not request.target_language:
-            async for session in get_session_local():
-                async with session.begin():
-                    query = await session.execute(select(User).where(User.username == request.username))
-                    user = query.scalar()
-                    if not user:
-                        logger.warning("User '%s' not found", request.username)
-                        raise MyHTTPException(status_code=404, error="User not found")
-                    request.target_language = user.language_preference
-                    logger.info(
-                        "User '%s' target language preference set to '%s'",
-                        request.username,
-                        user.language_preference,
-                    )
+        # Fetch the target language preference from Redis or database
+        target_language = request.target_language
+        if not target_language:
+            target_language = redis_client.get(request.username)
+
+            if not target_language:
+                async for session in get_session_local():
+                    async with session.begin():
+                        query = await session.execute(select(User).where(User.username == request.username))
+                        user = query.scalar()
+                        if not user:
+                            logger.warning("User '%s' not found", request.username)
+                            raise MyHTTPException(status_code=404, error="User not found")
+
+                        # Cache the user's language preference in Redis
+                        target_language = user.language_preference
+                        redis_client.set(request.username, target_language)
+                        logger.info(
+                            "Cached language preference for user '%s' as '%s'",
+                            request.username,
+                            target_language
+                        )
 
         # Perform Translation
-        translated = translator.translate(request.message, src=request.source_language, dest=request.target_language)
+        translated = translator.translate(request.message, src=request.source_language, dest=target_language)
         logger.info(
             "Successfully translated message from '%s' to '%s' for user '%s'",
-            request.source_language, request.target_language, request.username
+            request.source_language, target_language, request.username
         )
 
         return {
@@ -151,26 +162,36 @@ async def translate_message_service(request: TranslationRequest):
         raise HTTPException(status_code=500, detail=f"Translation failed: {str(e)}")
 
 
+
 async def send_message_service(request: SendMessageRequest):
     try:
-        # Fetch sender and receiver preferences
+        # Fetch sender's and receiver's language preferences from Redis or database
+        sender_language = redis_client.get(request.sender_username)
+        receiver_language = redis_client.get(request.receiver_username)
+
         async for session in get_session_local():
             async with session.begin():
-                sender_query = await session.execute(select(User).where(User.username == request.sender_username))
-                sender = sender_query.scalar()
-                if not sender:
-                    raise MyHTTPException(status_code=404, error="Sender not found")
+                if not sender_language:
+                    sender_query = await session.execute(select(User).where(User.username == request.sender_username))
+                    sender = sender_query.scalar()
+                    if not sender:
+                        raise MyHTTPException(status_code=404, error="Sender not found")
+                    sender_language = sender.language_preference
+                    redis_client.set(request.sender_username, sender_language)
 
-                receiver_query = await session.execute(select(User).where(User.username == request.receiver_username))
-                receiver = receiver_query.scalar()
-                if not receiver:
-                    raise MyHTTPException(status_code=404, error="Receiver not found")
+                if not receiver_language:
+                    receiver_query = await session.execute(select(User).where(User.username == request.receiver_username))
+                    receiver = receiver_query.scalar()
+                    if not receiver:
+                        raise MyHTTPException(status_code=404, error="Receiver not found")
+                    receiver_language = receiver.language_preference
+                    redis_client.set(request.receiver_username, receiver_language)
 
         # Translate the message
         translated_message = translator.translate(
             request.message,
-            src=sender.language_preference,
-            dest=receiver.language_preference
+            src=sender_language,
+            dest=receiver_language
         ).text
 
         # Store the message in MongoDB
@@ -206,6 +227,7 @@ async def send_message_service(request: SendMessageRequest):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Message sending failed: {str(e)}")
+
     
 
 async def get_chat_history_service(user1: str, user2: str):
