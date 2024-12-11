@@ -11,9 +11,9 @@ RUN pip install -r requirements.txt
 COPY . .
 
 # Set environment variables (these can be overridden at runtime)
-ENV POSTGRES_URL="postgresql+asyncpg://abc:abc@localhost:5432/proj"
-ENV MONGO_URL="mongodb://abc:abc@localhost:27017/chat_db?authSource=admin"
-ENV REDIS_URL="redis://redis:6379/0"
+#ENV POSTGRES_URL="postgresql+asyncpg://abc:abc@localhost:5432/proj"
+#ENV MONGO_URL="mongodb://abc:abc@localhost:27017/chat_db?authSource=admin"
+#ENV REDIS_URL="redis://redis:6379/0"
 
 # Expose port 80 (or whichever port you plan to use)
 EXPOSE 6767
