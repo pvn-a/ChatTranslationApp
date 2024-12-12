@@ -11,13 +11,16 @@ import JoinChatroom from "./components/JoinChatroom";
 import EditProfile from "./components/EditProfile";
 import PrivateRoute from "./components/PrivateRoute";
 import ChatList from "./components/ChatList";
-// import ChatInterface from "./components/ChatInterface";
+import ChatScreen from "./components/ChatScreen";
 import Navbar from "./components/Navbar";
 
 export const ColorModeContext = React.createContext();
 
 function App() {
-  const [user, setUser] = useState(null); // Stores the user state
+  const [user, setUser] = useState(() => {
+    const storedUsername = sessionStorage.getItem("username");
+    return storedUsername ? { username: storedUsername } : null;
+  });
   const [mode, setMode] = useState(() => localStorage.getItem("theme") || "dark");
 
   useEffect(() => {
@@ -43,8 +46,7 @@ function App() {
   );
 
   const handleLogout = () => {
-    // Clear session and reset user state
-    sessionStorage.removeItem("username");
+    sessionStorage.clear();
     setUser(null);
   };
 
@@ -53,15 +55,14 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Router>
-          {/* Common Navbar for all screens */}
           <Navbar user={user} onLogout={handleLogout} />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/anonymous" element={<AnonymousChat setUser={setUser} />} />
             <Route path="/login" element={<Login setUser={setUser} />} />
             <Route path="/signup" element={<SignUp />} />
-            {/* <Route path="/chat/:chatId" element={<ChatInterface />} /> */}
             <Route path="/chats" element={<ChatList />} />
+            <Route path="/chat/:receiverUsername" element={<ChatScreen />} />
             <Route
               path="/auth"
               element={

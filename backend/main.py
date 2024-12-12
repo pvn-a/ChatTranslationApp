@@ -13,7 +13,8 @@ from services import (
     edit_profile_service,
     translate_message_service,
     send_message_service,
-    get_chat_history_service
+    get_chat_history_service,
+    all_interacted_users
 )
 from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest, SendMessageRequest
 
@@ -91,3 +92,12 @@ async def get_chat_history(
     API endpoint to fetch chat history between two users.
     """
     return await get_chat_history_service(user1, user2)
+
+@app.get("/get-all-interacted-users")
+async def get_all_interacted_users(username: str):
+    try:
+        response = await all_interacted_users(username)
+        return response
+    except HTTPException as e:
+        logger.error("Error in get_all_interacted_users: %s", e.detail)
+        raise e
