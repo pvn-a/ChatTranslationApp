@@ -1,13 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  TextField,
-  Button,
-  Typography,
-  Container,
-  Box,
-  Link,
-} from "@mui/material";
+import { TextField, Button, Typography, Container, Box, Link } from "@mui/material";
 import config from "./config";
 
 function Login({ setUser }) {
@@ -27,7 +20,6 @@ function Login({ setUser }) {
       sessionStorage.setItem("username", data.username);
       sessionStorage.setItem("language_preference", data.language_preference);
       setUser({ username: data.username, language_preference: data.language_preference });
-      // alert(`Welcome ${data.username}`);
       navigate("/chats");
     } else {
       alert("Login failed. Check your credentials.");

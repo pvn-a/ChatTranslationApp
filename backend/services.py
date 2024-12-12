@@ -108,6 +108,10 @@ async def edit_profile_service(request: EditProfileRequest):
             user.language_preference = request.language_preference
     return {"status": "success", "message": "Profile updated"}
 
+##############################################################################################################################
+##############################################################################################################################
+##############################################################################################################################
+
 from database import redis_client
 
 async def translate_message_service(request: TranslationRequest):
@@ -265,3 +269,28 @@ async def get_chat_history_service(user1: str, user2: str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch chat history: {str(e)}")
+    
+async def all_interacted_users(username: str):
+    sample = {
+        "source_user": username,
+        "interactions": [
+            {
+                "user": "user2",
+                "last_interaction": "2024-12-09T09:46:47.073000"
+            },
+            {
+                "user": "user3",
+                "last_interaction": "2024-12-10T09:46:47.073000",
+                "message": "good stuff, nice"
+            },
+            {
+                "user": "user4",
+                "last_interaction": "2024-12-11T09:46:47.073000"
+            },
+            {
+                "user": "user1",
+                "last_interaction": "2024-12-11T09:46:47.073000"
+            }
+        ]
+    }
+    return sample

@@ -5,33 +5,30 @@ import { Button, Container, Typography, Box } from "@mui/material";
 const LandingPage = () => {
   const navigate = useNavigate();
 
+  const handleStartChatting = () => {
+    const username = sessionStorage.getItem("username");
+    if (username) {
+      navigate("/chats");
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <Container maxWidth="sm" style={{ textAlign: "center", marginTop: "50px" }}>
       <Typography variant="h3" gutterBottom>
         Polyglot
       </Typography>
-      {/* <Typography variant="h6" color="textSecondary" gutterBottom>
-        Your logo here
-      </Typography> */}
       <Box mt={4}>
         <Button
           variant="contained"
           color="primary"
           size="large"
-          onClick={() => navigate("/auth")}
+          onClick={handleStartChatting}
           style={{ margin: "10px" }}
         >
           Start Chatting ..
         </Button>
-        {/* <Button
-          variant="outlined"
-          color="secondary"
-          size="large"
-          onClick={() => navigate("/anonymous")}
-          style={{ margin: "10px" }}
-        >
-          Anonymous Chat
-        </Button> */}
       </Box>
     </Container>
   );
