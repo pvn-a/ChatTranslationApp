@@ -10,7 +10,7 @@ import pymongo
 from database import engine, Base, mongo_client, mongo_db, chat_collection, user_chats_collection, get_session_local
 from models import User
 from exceptions import MyHTTPException
-from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest, SendMessageRequest
+from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest, SendMessageRequest, LanguagePreferenceRequest
 from googletrans import Translator
 from database import redis_client
 
@@ -269,28 +269,75 @@ async def get_chat_history_service(user1: str, user2: str):
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch chat history: {str(e)}")
-    
+
+
 async def all_interacted_users(username: str):
-    sample = {
-        "source_user": username,
-        "interactions": [
-            {
-                "user": "user2",
-                "last_interaction": "2024-12-09T09:46:47.073000"
-            },
-            {
-                "user": "user3",
-                "last_interaction": "2024-12-10T09:46:47.073000",
-                "message": "good stuff, nice"
-            },
-            {
-                "user": "user4",
-                "last_interaction": "2024-12-11T09:46:47.073000"
-            },
-            {
-                "user": "user1",
-                "last_interaction": "2024-12-11T09:46:47.073000"
+    try:
+        # Query MongoDB for all interactions involving the given user
+        interactions = await user_chats_collection.find(
+            {"users": username}
+        ).sort("last_interaction", -1).to_list(length=None)  # Sort by last_interaction descending
+
+        if not interactions:
+            return {
+                "source_user": username,
+                "interactions": []
             }
-        ]
-    }
-    return sample
+
+        # Format the response
+        response = {
+            "source_user": username,
+            "interactions": [
+                {
+                    "user": list(filter(lambda u: u != username, record["users"]))[0],  # Get the other user
+                    "last_interaction": record.get("last_interaction").isoformat(),
+                }
+                for record in interactions
+            ]
+        }
+
+        return response
+    except Exception as e:
+        logger.error("Failed to fetch interacted users for '%s': %s", username, str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to fetch interacted users: {str(e)}")
+
+async def update_language_preference_service(request: LanguagePreferenceRequest):
+    try:
+        # Check if the user exists in the database
+        async for session in get_session_local():
+            async with session.begin():
+                query = await session.execute(select(User).where(User.username == request.username))
+                user = query.scalar()
+
+                if not user:
+                    raise HTTPException(status_code=404, detail="User not found")
+
+        # Fetch the old language preference from Redis
+        old_language = redis_client.get(request.username)
+
+        # Update the language preference in Redis
+        redis_client.set(request.username, request.new_language)
+
+        # Log the change
+        if old_language:
+            redis_client.delete(old_language)  # Clean up old key if necessary
+            logger.info(
+                "Updated language preference for user '%s': Old='%s', New='%s'",
+                request.username,
+                old_language,
+                request.new_language
+            )
+        else:
+            logger.info(
+                "Set new language preference for user '%s': '%s'",
+                request.username,
+                request.new_language
+            )
+
+        return {
+            "status": "success",
+            "message": f"Language preference updated to '{request.new_language}' for user '{request.username}'",
+        }
+    except Exception as e:
+        logger.error("Failed to update language preference for user '%s': %s", request.username, str(e))
+        raise HTTPException(status_code=500, detail=f"Failed to update language preference: {str(e)}")

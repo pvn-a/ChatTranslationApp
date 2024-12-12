@@ -34,3 +34,6 @@ class SendMessageRequest(BaseModel):
     receiver_username: str
     message: str
 
+class LanguagePreferenceRequest(BaseModel):
+    username: str
+    new_language: str
