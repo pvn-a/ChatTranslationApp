@@ -236,8 +236,8 @@ async def send_message_service(request: SendMessageRequest):
             notification_message = {
                 "sender": request.sender_username,
                 "receiver": request.receiver_username,
-                "message": f"{request.sender_username} has sent you a message"
-                # "timestamp": datetime.utcnow().isoformat()
+                "message": f"{request.sender_username} has sent you a message",
+                "timestamp": datetime.utcnow().isoformat()
             }
             producer.produce(
                 "notifications",
