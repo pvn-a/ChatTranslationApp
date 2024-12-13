@@ -60,16 +60,18 @@ async def cleanup_schemas_service():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Sign-Up Service
+# Sign-Up Service with Redis Integration
 async def sign_up_service(request: SignUpRequest):
     async for session in get_session_local():
         async with session.begin():
+            # Check if the user already exists
             existing_user = await session.execute(
                 select(User).where((User.username == request.username) | (User.email == request.email))
             )
             if existing_user.scalar():
                 raise MyHTTPException(status_code=400, error="User already exists")
 
+            # Hash the password and create a new user
             hashed_password = bcrypt.hash(request.password)
             new_user = User(
                 username=request.username,
@@ -78,6 +80,10 @@ async def sign_up_service(request: SignUpRequest):
                 language_preference=request.language_preference,
             )
             session.add(new_user)
+
+            # Store the username and language preference in Redis
+            redis_client.set(request.username, request.language_preference)
+
     return {"status": "success", "message": "Account created"}
 
 
