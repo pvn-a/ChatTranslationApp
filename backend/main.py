@@ -3,6 +3,8 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 import asyncio
+from consumer import consume_notifications
+
 
 from exceptions import MyHTTPException
 from services import (
@@ -23,6 +25,7 @@ from schemas import SignUpRequest, LoginRequest, EditProfileRequest, Translation
 
 app = FastAPI()
 logger = logging.getLogger(__name__)
+consumer_task = None
 
 app.add_middleware(
     CORSMiddleware,
@@ -148,3 +151,22 @@ async def get_notifications(username: str):
     except Exception as e:
         logger.error(f"Unexpected error fetching notifications for user {username}: {str(e)}")
         raise HTTPException(status_code=500, detail="Failed to fetch notifications.")
+
+@app.on_event("startup")
+async def startup_event():
+    global consumer_task
+    logging.info("Starting FastAPI server and Kafka consumer...")
+    # Start the Kafka consumer as a background task
+    consumer_task = asyncio.create_task(consume_notifications())
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    global consumer_task
+    if consumer_task:
+        logging.info("Shutting down Kafka consumer...")
+        # Cancel the consumer task
+        consumer_task.cancel()
+        try:
+            await consumer_task
+        except asyncio.CancelledError:
+            logging.info("Kafka consumer task successfully canceled.")
