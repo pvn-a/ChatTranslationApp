@@ -16,7 +16,8 @@ from services import (
     send_message_service,
     get_chat_history_service,
     all_interacted_users,
-    update_language_preference_service
+    update_language_preference_service,
+    fetch_notifications
 )
 from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest, SendMessageRequest, LanguagePreferenceRequest
 
@@ -131,3 +132,19 @@ async def update_language_preference(request: LanguagePreferenceRequest):
     API endpoint to update the user's language preference in Redis.
     """
     return await update_language_preference_service(request)
+
+
+@app.get("/get-notifications")
+async def get_notifications(username: str):
+    """
+    API to fetch all notification messages for a specific user.
+    """
+    try:
+        notifications = await fetch_notifications(username)
+        return {"status": "success", "notifications": notifications}
+    except HTTPException as e:
+        logger.error(f"Error fetching notifications for user {username}: {e.detail}")
+        raise e
+    except Exception as e:
+        logger.error(f"Unexpected error fetching notifications for user {username}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch notifications.")

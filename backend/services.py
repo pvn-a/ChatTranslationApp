@@ -5,15 +5,15 @@ import traceback
 import logging
 from datetime import datetime
 import pymongo
+import json
 
 
-from database import engine, Base, mongo_client, mongo_db, chat_collection, user_chats_collection, get_session_local
+from database import engine, Base, mongo_client, mongo_db, chat_collection, user_chats_collection, notifications_collection, get_session_local
 from models import User
 from exceptions import MyHTTPException
 from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest, SendMessageRequest, LanguagePreferenceRequest
 from googletrans import Translator
-from database import redis_client
-
+from database import redis_client,producer
 
 translator = Translator()
 logger = logging.getLogger(__name__)
@@ -175,7 +175,7 @@ async def translate_message_service(request: TranslationRequest):
 
 async def send_message_service(request: SendMessageRequest):
     try:
-        # Fetch sender's and receiver's language preferences from Redis or database
+        # Fetch sender's and receiver's language preferences
         sender_language = redis_client.get(request.sender_username)
         receiver_language = redis_client.get(request.receiver_username)
 
@@ -229,6 +229,23 @@ async def send_message_service(request: SendMessageRequest):
                 {"_id": chat_relationship["_id"]},
                 {"$set": {"last_interaction": datetime.utcnow()}}
             )
+
+        # Produce a Kafka message for notification
+        try:
+            notification_message = {
+                "sender": request.sender_username,
+                "receiver": request.receiver_username,
+                "message": f"{request.sender_username} has sent you a message",
+                "timestamp": datetime.utcnow().isoformat()
+            }
+            producer.produce(
+                "notifications",
+                key=request.receiver_username,
+                value=json.dumps(notification_message)
+            )
+            producer.flush()  # Ensure the message is sent
+        except Exception as e:
+            logger.error(f"Failed to produce Kafka message: {str(e)}")
 
         return {
             "status": "success",
@@ -347,3 +364,27 @@ async def update_language_preference_service(request: LanguagePreferenceRequest)
     except Exception as e:
         logger.error("Failed to update language preference for user '%s': %s", request.username, str(e))
         raise HTTPException(status_code=500, detail=f"Failed to update language preference: {str(e)}")
+    
+async def fetch_notifications(username: str):
+    try:
+        # Query MongoDB for all notifications for the given username
+        notifications = await notifications_collection.find(
+            {"receiver": username}
+        ).sort("timestamp", pymongo.DESCENDING).to_list(length=None)
+
+        if not notifications:
+            return []
+
+        # Format the result
+        formatted_notifications = [
+            {
+                "sender": notification["sender"],
+                "message": notification["message"],
+                "timestamp": notification["timestamp"],
+            }
+            for notification in notifications
+        ]
+
+        return formatted_notifications
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch notifications: {str(e)}")

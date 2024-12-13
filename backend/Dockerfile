@@ -14,6 +14,7 @@ COPY . .
 #ENV POSTGRES_URL="postgresql+asyncpg://abc:abc@localhost:5432/proj"
 #ENV MONGO_URL="mongodb://abc:abc@localhost:27017/chat_db?authSource=admin"
 #ENV REDIS_URL="redis://redis:6379/0"
+#ENV KAFKA_BROKER="kafka:9092"
 
 # Expose port 80 (or whichever port you plan to use)
 EXPOSE 6767
