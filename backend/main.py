@@ -19,7 +19,8 @@ from services import (
     get_chat_history_service,
     all_interacted_users,
     update_language_preference_service,
-    fetch_notifications
+    fetch_notifications,
+    get_chat_users_service
 )
 from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest, SendMessageRequest, LanguagePreferenceRequest
 
@@ -190,3 +191,16 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"Error: {e}")
     finally:
         manager.disconnect(websocket)  # Ensure cleanup in all cases
+
+@app.get("/get-chat-users")
+async def get_chat_users(current_username: str):
+    """
+    API to fetch all users other than the current user from PostgreSQL.
+    """
+    try:
+        chat_users = await get_chat_users_service(current_username)
+        return {"status": "success", "users": chat_users}
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch users: {str(e)}")

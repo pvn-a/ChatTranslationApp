@@ -389,3 +389,16 @@ async def fetch_notifications(username: str):
         return formatted_notifications
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to fetch notifications: {str(e)}")
+    
+async def get_chat_users_service(current_username: str):
+    try:
+        async for session in get_session_local():
+            async with session.begin():
+                # Query to fetch all users except the current user
+                result = await session.execute(
+                    select(User.username).where(User.username != current_username)
+                )
+                users = result.scalars().all()
+        return users
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error querying users: {str(e)}")
