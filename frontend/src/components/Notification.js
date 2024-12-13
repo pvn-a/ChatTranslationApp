@@ -9,6 +9,7 @@ const NotificationComponent = () => {
 
   useEffect(() => {
     if (notification) {
+      console.log(notification);
       setOpen(true); // Open snackbar when a new notification arrives
     }
   }, [notification]);
