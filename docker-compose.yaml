@@ -35,20 +35,22 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:latest
-    container_name: kafka_container
+    container_name: kafka
+    depends_on:
+      - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "notifications:1:1" 
     ports:
       - "9092:9092"
-    depends_on:
-      - zookeeper
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
-    container_name: zookeeper_container
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -74,3 +76,7 @@ volumes:
   postgres_data:
   mongo_data:
   redis_data:
+
+networks:
+  default:
+    name: my_network

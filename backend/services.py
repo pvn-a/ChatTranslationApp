@@ -38,6 +38,7 @@ async def initialize_schemas_service():
         if "chat_db" not in db_list:
             await mongo_db.create_collection("chats")
             await mongo_db.create_collection("user_chats")
+            await mongo_db.create_collection("notifications")
             msg += "MongoDB collection created. "
         else:
             msg += "MongoDB collection already exists. "
@@ -47,18 +48,18 @@ async def initialize_schemas_service():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# Cleanup Databases
 async def cleanup_schemas_service():
     try:
+        # Drop all PostgreSQL schemas
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.drop_all)
 
-        await mongo_db.drop_collection("chats")
+        # Drop the entire chat_db database in MongoDB
+        await mongo_client.drop_database("chat_db")
 
         return {"status": "success", "message": "Databases cleaned up"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
 
 # Sign-Up Service with Redis Integration
 async def sign_up_service(request: SignUpRequest):
