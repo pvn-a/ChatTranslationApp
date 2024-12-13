@@ -24,25 +24,6 @@ from services import (
 from schemas import SignUpRequest, LoginRequest, EditProfileRequest, TranslationRequest, SendMessageRequest, LanguagePreferenceRequest
 
 
-# class ConnectionManager:
-#     def __init__(self):
-#         self.active_connections: list[WebSocket] = []
-
-#     async def connect(self, websocket: WebSocket):
-#         await websocket.accept()
-#         self.active_connections.append(websocket)
-
-#     def disconnect(self, websocket: WebSocket):
-#         self.active_connections.remove(websocket)
-
-#     async def broadcast(self, message: str):
-#         for connection in self.active_connections:
-#             try:
-#                 await connection.send_text(message)
-#             except Exception as e:
-#                 print(f"Failed to send message: {e}")
-
-
 app = FastAPI()
 logger = logging.getLogger(__name__)
 consumer_task = None
@@ -176,7 +157,7 @@ async def get_notifications(username: str):
 @app.on_event("startup")
 async def startup_event():
     global consumer_task
-    logging.info("Starting FastAPI server and Kafka consumer...")
+    logger.info("Starting Kafka consumer...")
     # Start the Kafka consumer as a background task
     consumer_task = asyncio.create_task(consume_notifications())
 
@@ -193,17 +174,19 @@ async def shutdown_event():
             logging.info("Kafka consumer task successfully canceled.")
 
 
+from connectionmanager import ConnectionManager
+manager = ConnectionManager()
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    await websocket.accept()
+    await manager.connect(websocket)
     try:
-        counter = 1  # Initialize the message counter
         while True:
-            # Send an incrementing message to the client
-            await websocket.send_text(f"Sent message {counter}")
-            print(f"Sent: Sent message {counter}")
-            counter += 1  # Increment the counter
-            await asyncio.sleep(5)  # Wait for 5 seconds
+            await asyncio.sleep(1)  # Keep the connection alive
+    except WebSocketDisconnect:
+        # print(f"WebSocket disconnected: {id(websocket)}")
+        manager.disconnect(websocket)
     except Exception as e:
-        print(f"WebSocket error: {e}")
-        await websocket.close()
+        print(f"Error: {e}")
+    finally:
+        manager.disconnect(websocket)  # Ensure cleanup in all cases
