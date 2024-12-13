@@ -18,10 +18,10 @@ const Chats = () => {
   const [interactions, setInteractions] = useState([]);
   const [availableUsers, setAvailableUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState("");
-  const username = sessionStorage.getItem("username"); // Get logged-in username from sessionStorage
+  const [notifications, setNotifications] = useState([]);
+  const username = sessionStorage.getItem("username");
   const navigate = useNavigate();
 
-  // Fetch users the logged-in user has interacted with
   useEffect(() => {
     const fetchInteractedUsers = async () => {
       try {
@@ -47,7 +47,6 @@ const Chats = () => {
     }
   }, [username]);
 
-  // Fetch all available users
   useEffect(() => {
     const fetchAvailableUsers = async () => {
       try {
@@ -68,6 +67,29 @@ const Chats = () => {
     }
   }, [username]);
 
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch(`${config.apiUrl}/get-notifications?username=${username}`);
+        if (response.ok) {
+          const data = await response.json();
+          const sortedNotifications = data.notifications.sort(
+            (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+          );
+          setNotifications(sortedNotifications);
+        } else {
+          console.error("Failed to fetch notifications");
+        }
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      }
+    };
+
+    const interval = setInterval(fetchNotifications, 5000);
+    fetchNotifications();
+    return () => clearInterval(interval);
+  }, [username]);
+
   const handleUserClick = (receiverUsername) => {
     navigate(`/chat/${receiverUsername}`);
   };
@@ -81,7 +103,7 @@ const Chats = () => {
   };
 
   return (
-    <Container maxWidth="sm" style={{ marginTop: "20px" }}>
+    <Container maxWidth="sm" style={{ marginTop: "20px", paddingBottom: "120px" }}>
       <Typography variant="h4" gutterBottom>
         Chats
       </Typography>
@@ -105,8 +127,18 @@ const Chats = () => {
         </FormControl>
       </Box>
 
-      {/* List of interactions */}
-      <Box mt={4}>
+      {/* Scrollable Chat List */}
+      <Box
+        mt={4}
+        sx={{
+          maxHeight: "305px", // Reduced height for the chat list
+          overflowY: "auto",
+          backgroundColor: "#1e1e1e",
+          borderRadius: "10px",
+          padding: "10px",
+          border: "1px solid #444",
+        }}
+      >
         {interactions.length > 0 ? (
           <List>
             {interactions.map((interaction) => (
@@ -126,6 +158,34 @@ const Chats = () => {
         ) : (
           <Typography variant="body1">No interactions found.</Typography>
         )}
+      </Box>
+
+      {/* Notifications Section */}
+      <Box
+        mt={4}
+        sx={{
+          backgroundColor: "#2e2e2e",
+          borderRadius: "10px",
+          boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+          maxHeight: "150px",
+          overflowY: "auto",
+          color: "#ffffff",
+          padding: "10px",
+          border: "1px solid #444",
+        }}
+      >
+        <Typography variant="h6" gutterBottom style={{ color: "#00bcd4" }}>
+          Notifications
+        </Typography>
+        <List>
+          {notifications.map((notification, index) => (
+            <ListItem key={index} divider>
+              <ListItemText
+                primary={`${new Date(notification.timestamp).toLocaleString()}: ${notification.message}`}
+              />
+            </ListItem>
+          ))}
+        </List>
       </Box>
     </Container>
   );

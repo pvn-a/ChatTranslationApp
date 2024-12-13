@@ -24,7 +24,8 @@ function App() {
     const storedUsername = sessionStorage.getItem("username");
     return storedUsername ? { username: storedUsername } : null;
   });
-  const [mode, setMode] = useState(() => localStorage.getItem("theme") || "dark");
+  // const [mode, setMode] = useState(() => localStorage.getItem("theme") || "dark");
+  const [mode, setMode] = useState(() => "dark");
 
   useEffect(() => {
     localStorage.setItem("theme", mode);

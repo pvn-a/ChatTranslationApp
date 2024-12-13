@@ -41,11 +41,11 @@ const Navbar = ({ user, onLogout }) => {
           Polyglot
         </Typography>
         <Box display="flex" alignItems="center" gap={2}>
-          <Switch
+          {/* <Switch
             checked={colorMode.mode === "dark"}
             onChange={colorMode.toggleColorMode}
             color="default"
-          />
+          /> */}
           {currentUser ? (
             <>
               <Typography variant="body1">{`Hello, ${currentUser.username}`}</Typography>
