@@ -13,8 +13,9 @@ import PrivateRoute from "./components/PrivateRoute";
 import ChatList from "./components/ChatList";
 import ChatScreen from "./components/ChatScreen";
 import Navbar from "./components/Navbar";
-// import { WebSocketProvider } from "./components/WebSocket";
-// import NotificationComponent from "./components/Notification";
+import Footer from "./components/Footer"; // Import Footer
+import { WebSocketProvider } from "./components/WebSocket";
+import NotificationComponent from "./components/Notification";
 
 export const ColorModeContext = React.createContext();
 
@@ -54,41 +55,42 @@ function App() {
 
   return (
     // <WebSocketProvider>
-    // <NotificationComponent />
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router>
-          <Navbar user={user} onLogout={handleLogout} />
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/anonymous" element={<AnonymousChat setUser={setUser} />} />
-            <Route path="/login" element={<Login setUser={setUser} />} />
-            <Route path="/signup" element={<SignUp />} />
-            <Route path="/chats" element={<ChatList />} />
-            <Route path="/chat/:receiverUsername" element={<ChatScreen />} />
-            <Route
-              path="/auth"
-              element={
-                <PrivateRoute user={user}>
-                  <AuthChat user={user} setUser={setUser} />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/create-chatroom" element={<CreateChatroom />} />
-            <Route path="/join-chatroom" element={<JoinChatroom />} />
-            <Route
-              path="/edit-profile"
-              element={
-                <PrivateRoute user={user}>
-                  <EditProfile user={user} setUser={setUser} />
-                </PrivateRoute>
-              }
-            />
-          </Routes>
-        </Router>
-      </ThemeProvider>
-    </ColorModeContext.Provider>
+    //   <NotificationComponent />
+      <ColorModeContext.Provider value={colorMode}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Router>
+            <Navbar user={user} onLogout={handleLogout} />
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/anonymous" element={<AnonymousChat setUser={setUser} />} />
+              <Route path="/login" element={<Login setUser={setUser} />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/chats" element={<ChatList />} />
+              <Route path="/chat/:receiverUsername" element={<ChatScreen />} />
+              <Route
+                path="/auth"
+                element={
+                  <PrivateRoute user={user}>
+                    <AuthChat user={user} setUser={setUser} />
+                  </PrivateRoute>
+                }
+              />
+              <Route path="/create-chatroom" element={<CreateChatroom />} />
+              <Route path="/join-chatroom" element={<JoinChatroom />} />
+              <Route
+                path="/edit-profile"
+                element={
+                  <PrivateRoute user={user}>
+                    <EditProfile user={user} setUser={setUser} />
+                  </PrivateRoute>
+                }
+              />
+            </Routes>
+            <Footer /> {/* Add Footer here */}
+          </Router>
+        </ThemeProvider>
+      </ColorModeContext.Provider>
 //    </WebSocketProvider>
   );
 }

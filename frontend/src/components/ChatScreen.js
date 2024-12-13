@@ -22,7 +22,6 @@ const ChatScreen = () => {
             (a, b) => new Date(a.timestamp) - new Date(b.timestamp)
           );
           setMessages(sortedMessages);
-          // scrollToBottom();
         } else {
           console.error("Failed to fetch messages");
         }
@@ -32,8 +31,6 @@ const ChatScreen = () => {
     };
 
     fetchMessages();
-
-    // Poll for new messages every few seconds
     const interval = setInterval(fetchMessages, 5000);
     return () => clearInterval(interval);
   }, [senderUsername, receiverUsername]);
@@ -61,7 +58,7 @@ const ChatScreen = () => {
             sender: senderUsername,
             receiver: receiverUsername,
             original_message: newMessage.trim(),
-            translated_message: newMessage.trim(), // Add a placeholder translated message if needed
+            translated_message: newMessage.trim(),
             timestamp: new Date().toISOString(),
           },
         ]);
@@ -87,18 +84,24 @@ const ChatScreen = () => {
   };
 
   return (
-    <Container maxWidth="sm" style={{ marginTop: "20px" }}>
-      <Typography variant="h4" gutterBottom>
+    <Container maxWidth="sm" style={{ marginTop: "20px", color: "#f5f5f5" }}>
+      {/* Set bluish color for the header */}
+      <Typography
+        variant="h4"
+        gutterBottom
+        style={{ color: "#1E90FF", fontWeight: "bold" }} // Bluish color for the header
+      >
         Chat with {receiverUsername}
       </Typography>
       <Box
         style={{
-          border: "1px solid #ccc",
+          border: "1px solid #444",
           borderRadius: "8px",
           padding: "10px",
           height: "400px",
           overflowY: "scroll",
           marginBottom: "10px",
+          backgroundColor: "#222", // Background for the chat box
         }}
       >
         <List>
@@ -113,15 +116,21 @@ const ChatScreen = () => {
             >
               <ListItemText
                 primary={
-                  msg.sender === senderUsername
-                    ? msg.original_message
-                    : msg.translated_message
+                  <span style={{ color: "#ffffff" }}>
+                    {msg.sender === senderUsername
+                      ? msg.original_message
+                      : msg.translated_message}
+                  </span>
                 }
-                secondary={new Date(msg.timestamp).toLocaleString()}
+                secondary={
+                  <span style={{ color: "#cccccc" }}>
+                    {new Date(msg.timestamp).toLocaleString()}
+                  </span>
+                }
                 style={{
-                  backgroundColor: msg.sender === senderUsername ? "#d1e7dd" : "#f8d7da",
-                  borderRadius: "8px",
-                  padding: "5px 10px",
+                  backgroundColor: msg.sender === senderUsername ? "#2a6041" : "#8b3f4c",
+                  borderRadius: "12px",
+                  padding: "10px 15px",
                   maxWidth: "70%",
                 }}
               />
@@ -138,8 +147,24 @@ const ChatScreen = () => {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           onKeyPress={handleKeyPress}
+          InputProps={{
+            style: {
+              backgroundColor: "#333", // Dark background for the input box
+              color: "#ffffff",
+              borderRadius: "8px",
+            },
+          }}
         />
-        <Button variant="contained" color="primary" onClick={handleSendMessage}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSendMessage}
+          style={{
+            backgroundColor: "#0056b3", // Button color
+            color: "#fff",
+            fontWeight: "bold",
+          }}
+        >
           Send
         </Button>
       </Box>
