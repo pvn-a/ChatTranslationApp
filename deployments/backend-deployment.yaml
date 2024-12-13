@@ -19,9 +19,9 @@ spec:
             - containerPort: 6767
           env:
             - name: POSTGRES_URL
-              value: "postgresql://abc:abc@postgres:5432/proj"
+              value: "postgresql+asyncpg://abc:abc@postgres:5432/proj"
             - name: MONGO_URL
-              value: "mongodb://abc:abc@mongo:27017/chat_db"
+              value: "mongodb://abc:abc@mongo:27017/chat_db?authSource=admin"
             - name: REDIS_URL
               value: "redis://redis:6379/0"
             - name: KAFKA_BROKER
@@ -37,6 +37,6 @@ spec:
     app: backend
   ports:
     - protocol: TCP
-      port: 80
+      port: 6767
       targetPort: 6767
   type: ClusterIP
