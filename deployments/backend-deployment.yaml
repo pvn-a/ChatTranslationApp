@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: <your-backend-image>  # Replace with your backend Docker image
+          image: rondon69/backend:v1  # Replace with your backend Docker image
           ports:
             - containerPort: 6767
           env:
@@ -22,6 +22,10 @@ spec:
               value: "postgresql://abc:abc@postgres:5432/proj"
             - name: MONGO_URL
               value: "mongodb://abc:abc@mongo:27017/chat_db"
+            - name: REDIS_URL
+              value: "redis://redis:6379/0"
+            - name: KAFKA_BROKER
+              value: "kafka:9092"
 
 ---
 apiVersion: v1

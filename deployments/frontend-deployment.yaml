@@ -19,7 +19,9 @@ spec:
             - containerPort: 3000
           env:
             - name: BACKEND_URL
-              value: "http://backend-service:5000"  # Replace with your backend service URL
+              value: "http://backend:6767"  # Replace with your backend service URL
+            - name: BACKEND_URL_WS
+              value: "ws://backend:6767"
 ---
 apiVersion: v1
 kind: Service
@@ -30,6 +32,6 @@ spec:
     app: frontend
   ports:
     - protocol: TCP
-      port: 80
+      port: 3000
       targetPort: 3000
   type: ClusterIP

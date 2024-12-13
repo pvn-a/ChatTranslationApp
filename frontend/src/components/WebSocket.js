@@ -8,7 +8,7 @@ const WebSocketContext = createContext();
 export const WebSocketProvider = ({ children }) => {
   const [notification, setNotification] = useState(null);
 
-  const { sendJsonMessage, lastMessage } = useWebSocket(`ws://${config.socketUrl}/ws`, {
+  const { sendJsonMessage, lastMessage } = useWebSocket(`${config.socketUrl}/ws`, {
     onOpen: () => console.log("WebSocket connection opened"),
     onClose: () => console.log("WebSocket connection closed"),
     shouldReconnect: () => true, // Reconnect on disconnection
