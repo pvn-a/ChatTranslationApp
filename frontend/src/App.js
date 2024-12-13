@@ -13,6 +13,8 @@ import PrivateRoute from "./components/PrivateRoute";
 import ChatList from "./components/ChatList";
 import ChatScreen from "./components/ChatScreen";
 import Navbar from "./components/Navbar";
+import { WebSocketProvider } from "./components/WebSocket";
+import NotificationComponent from "./components/Notification";
 
 export const ColorModeContext = React.createContext();
 
@@ -51,6 +53,8 @@ function App() {
   };
 
   return (
+    <WebSocketProvider>
+    <NotificationComponent />
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
@@ -85,6 +89,7 @@ function App() {
         </Router>
       </ThemeProvider>
     </ColorModeContext.Provider>
+    </WebSocketProvider>
   );
 }
 
