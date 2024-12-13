@@ -39,4 +39,4 @@ spec:
     - protocol: TCP
       port: 6767
       targetPort: 6767
-  type: ClusterIP
+  type: LoadBalancer
