@@ -1,45 +1,82 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import config from "./config";
+import React, { useState } from "react";
+import {
+  Container,
+  Typography,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-const EditProfile = ({ user, setUser }) => {
-  const [password, setPassword] = useState('');
-  const [language, setLanguage] = useState('');
+const EditProfile = () => {
+  const [newLanguage, setNewLanguage] = useState("");
   const navigate = useNavigate();
+  const username = sessionStorage.getItem("username");
 
-  const handleSave = async () => {
+  const handleSaveLanguage = async () => {
+    if (!username || !newLanguage) {
+      alert("Please select a valid language.");
+      return;
+    }
+
     try {
-      const response = await axios.post(`${config.apiUrl}/edit-profile`, {
-        username: user.username,
-        password,
-        language,
+      const response = await fetch("http://localhost:6767/update-language-preference", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, new_language: newLanguage }),
       });
-      setUser({ username: response.data.username });
-      alert('Profile updated successfully!');
-      navigate('/auth');
+
+      if (response.ok) {
+        sessionStorage.setItem("language_preference", newLanguage);
+        alert("Profile updated successfully!");
+        navigate("/chats");
+      } else {
+        alert("Failed to update profile. Please try again.");
+      }
     } catch (error) {
-      alert('Failed to update profile.');
+      console.error("Error updating profile:", error);
+      alert("An error occurred. Please try again.");
     }
   };
 
   return (
-    <div className="container">
-      <h1>Edit Profile</h1>
-      <input
-        type="password"
-        placeholder="New Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Preferred Language"
-        value={language}
-        onChange={(e) => setLanguage(e.target.value)}
-      />
-      <button onClick={handleSave}>Save</button>
-    </div>
+    <Container maxWidth="sm" style={{ marginTop: "50px" }}>
+      <Typography variant="h4" gutterBottom>
+        Edit Profile
+      </Typography>
+      <Box display="flex" flexDirection="column" gap={2} mt={2}>
+        <FormControl fullWidth>
+          <InputLabel id="language-select-label">Preferred Language</InputLabel>
+          <Select
+            labelId="language-select-label"
+            value={newLanguage}
+            onChange={(e) => setNewLanguage(e.target.value)}
+          >
+            <MenuItem value="en">English</MenuItem>
+            <MenuItem value="fr">French</MenuItem>
+            <MenuItem value="es">Spanish</MenuItem>
+            <MenuItem value="de">German</MenuItem>
+          </Select>
+        </FormControl>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleSaveLanguage}
+        >
+          Save
+        </Button>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => navigate("/chats")}
+        >
+          Cancel
+        </Button>
+      </Box>
+    </Container>
   );
 };
 
