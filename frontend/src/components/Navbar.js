@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { AppBar, Toolbar, Typography, Button, Box, Switch } from "@mui/material";
+import { AppBar, Toolbar, Typography, Button, Box, Switch, Menu, MenuItem } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { ColorModeContext } from "../App";
 
@@ -7,14 +7,29 @@ const Navbar = ({ user, onLogout }) => {
   const colorMode = useContext(ColorModeContext);
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(user);
+  const [anchorEl, setAnchorEl] = useState(null);
 
   useEffect(() => {
-    setCurrentUser(user); // Sync with the user prop whenever it changes
+    setCurrentUser(user);
   }, [user]);
 
+  const handleMenuClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleEditProfile = () => {
+    setAnchorEl(null);
+    navigate("/edit-profile");
+  };
+
   const handleLogout = () => {
-    sessionStorage.clear(); // Clear session storage variables
-    setCurrentUser(null); // Clear local user state
+    setAnchorEl(null);
+    sessionStorage.clear();
+    setCurrentUser(null);
     onLogout();
     navigate("/");
   };
@@ -34,14 +49,20 @@ const Navbar = ({ user, onLogout }) => {
           {currentUser ? (
             <>
               <Typography variant="body1">{`Hello, ${currentUser.username}`}</Typography>
-              <Button color="inherit" onClick={handleLogout}>
-                Logout
+              <Button color="inherit" onClick={handleMenuClick}>
+                Profile
               </Button>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={handleEditProfile}>Edit Profile</MenuItem>
+                <MenuItem onClick={handleLogout}>Logout</MenuItem>
+              </Menu>
             </>
           ) : (
-            <Button color="inherit" onClick={() => navigate("/login")}>
-              Login
-            </Button>
+            <Button color="inherit" onClick={() => navigate("/login")}>Login</Button>
           )}
         </Box>
       </Toolbar>
