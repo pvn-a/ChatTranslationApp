@@ -24,6 +24,8 @@ spec:
               value: "abc"
             - name: POSTGRES_DB
               value: "proj"
+            - name: PGDATA
+              value: "/var/lib/postgresql/data/pgdata"  # Use a subdirectory to avoid "lost+found" issue
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
@@ -56,4 +58,4 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 5Gi
+      storage: 2Gi
