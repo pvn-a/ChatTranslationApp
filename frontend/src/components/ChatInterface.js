@@ -9,6 +9,7 @@ import {
   TextField,
   Button,
 } from "@mui/material";
+import config from "./config";
 
 const ChatInterface = () => {
   const { chatId } = useParams(); // Get the chat ID from the URL
@@ -22,7 +23,7 @@ const ChatInterface = () => {
     async (loadMore = false) => {
       try {
         const response = await fetch(
-          `http://localhost:6767/chats/${chatId}/messages?page=${loadMore ? page : 1}&limit=5`
+          `${config.apiUrl}/chats/${chatId}/messages?page=${loadMore ? page : 1}&limit=5`
         );
         const data = await response.json();
 
@@ -42,7 +43,7 @@ const ChatInterface = () => {
   const handleSendMessage = async () => {
     if (inputMessage.trim()) {
       try {
-        await fetch(`http://localhost:6767/chats/${chatId}/messages`, {
+        await fetch(`${config.apiUrl}/chats/${chatId}/messages`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text: inputMessage }),

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Container, Typography, List, ListItem, ListItemText, Box, Button, TextField } from "@mui/material";
+import config from "./config";
 
 const Chats = () => {
   const [interactions, setInteractions] = useState([]);
@@ -10,7 +11,7 @@ const Chats = () => {
   useEffect(() => {
     const fetchInteractedUsers = async () => {
       try {
-        const response = await fetch(`http://localhost:6767/get-all-interacted-users?username=${username}`);
+        const response = await fetch(`${config.apiUrl}/get-all-interacted-users?username=${username}`);
         if (response.ok) {
           const data = await response.json();
           // Sort interactions by the `last_interaction` timestamp in descending order
