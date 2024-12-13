@@ -18,9 +18,9 @@ spec:
           ports:
             - containerPort: 3000
           env:
-            - name: BACKEND_URL
+            - name: REACT_APP_BACKEND_URL
               value: "http://backend:6767"  # Replace with your backend service URL
-            - name: BACKEND_URL_WS
+            - name: REACT_APP_BACKEND_URL_WS
               value: "ws://backend:6767"
 ---
 apiVersion: v1
