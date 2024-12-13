@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Container, Typography, Box, TextField, Button, List, ListItem, ListItemText } from "@mui/material";
+import config from "./config";
 
 const ChatScreen = () => {
   const { receiverUsername } = useParams(); // Get the receiver's username from the URL
@@ -13,7 +14,7 @@ const ChatScreen = () => {
     const fetchMessages = async () => {
       try {
         const response = await fetch(
-          `http://localhost:6767/chat-history?user1=${senderUsername}&user2=${receiverUsername}`
+          `${config.apiUrl}/chat-history?user1=${senderUsername}&user2=${receiverUsername}`
         );
         if (response.ok) {
           const data = await response.json();
@@ -47,7 +48,7 @@ const ChatScreen = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:6767/send-message", {
+      const response = await fetch(`${config.apiUrl}/send-message`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(messageBody),

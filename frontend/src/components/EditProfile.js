@@ -10,6 +10,7 @@ import {
   Button,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import config from "./config";
 
 const EditProfile = () => {
   const [newLanguage, setNewLanguage] = useState("");
@@ -23,7 +24,7 @@ const EditProfile = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:6767/update-language-preference", {
+      const response = await fetch(`${config.apiUrl}/update-language-preference`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, new_language: newLanguage }),
