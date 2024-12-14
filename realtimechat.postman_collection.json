@@ -1,0 +1,337 @@
+{
+	"info": {
+		"_postman_id": "7b00bbfe-6871-476b-a613-495be392e71b",
+		"name": "realtimechat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40277244",
+		"_collection_link": "https://custom-5225.postman.co/workspace/custom-Workspace~9ce1b5b2-634c-4d17-8713-a6b732189df9/collection/40277244-7b00bbfe-6871-476b-a613-495be392e71b?action=share&source=collection_link&creator=40277244"
+	},
+	"item": [
+		{
+			"name": "health",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:6767/health",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "cleanup",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:6767/cleanup",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"cleanup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "initialize",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:6767/initialize",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"initialize"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "sign-up",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"user10\",\n    \"email\": \"user10@gmail.com\",\n    \"password\": \"123\",\n    \"language_preference\": \"es\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{host}}:6767/sign-up",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"sign-up"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "user_123",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "123qwe",
+							"disabled": true
+						},
+						{
+							"key": "language_preference",
+							"value": "en",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"user1\",\n    \"password\": \"123\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{host}}:6767/login",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "edit-profile",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"user_123\",\n    \"language_preference\": \"fr\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{host}}:6767/edit-profile",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"edit-profile"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "send-message",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"sender_username\": \"user10\",\n  \"receiver_username\": \"user1\",\n  \"message\": \"I am good dude, thanks for asking?\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://{{host}}:6767/send-message",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"send-message"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "chat-history",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:6767/chat-history?user1=user2&user2=user1",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"chat-history"
+					],
+					"query": [
+						{
+							"key": "user1",
+							"value": "user2"
+						},
+						{
+							"key": "user2",
+							"value": "user1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-all-interacted-users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:6767/get-all-interacted-users?username=user1",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"get-all-interacted-users"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "user1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "update-language-preference",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "get-notifications",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:6767/get-notifications?username=user2",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"get-notifications"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "user2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-chat-users",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://{{host}}:6767/get-chat-users?current_username=user1",
+					"protocol": "http",
+					"host": [
+						"{{host}}"
+					],
+					"port": "6767",
+					"path": [
+						"get-chat-users"
+					],
+					"query": [
+						{
+							"key": "current_username",
+							"value": "user1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "localhost"
+		}
+	]
+}
