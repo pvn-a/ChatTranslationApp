@@ -1,11 +1,5 @@
 # ChatTranslationApp
 
-# Team
-### 1. Nishchal Shetty
-### 2. Pavan Appanna
-
-
-
 # Real Time Chat Translation Application (Polyglot)
 
 ## Introduction
